@@ -67,7 +67,7 @@ public class OrcMapredRecordWriter<V extends Writable>
   public OrcMapredRecordWriter(Writer writer, int rowBatchSize) {
     this.writer = writer;
     schema = writer.getSchema();
-    this.batch = schema.createRowBatch();
+    this.batch = schema.createRowBatch(rowBatchSize);
     isTopStruct = schema.getCategory() == TypeDescription.Category.STRUCT;
   }
 
