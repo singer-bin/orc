@@ -61,6 +61,10 @@ public class OrcMapredRecordWriter<V extends Writable>
   private final boolean isTopStruct;
 
   public OrcMapredRecordWriter(Writer writer) {
+    this(writer, VectorizedRowBatch.DEFAULT_SIZE);
+  }
+
+  public OrcMapredRecordWriter(Writer writer, int rowBatchSize) {
     this.writer = writer;
     schema = writer.getSchema();
     this.batch = schema.createRowBatch();

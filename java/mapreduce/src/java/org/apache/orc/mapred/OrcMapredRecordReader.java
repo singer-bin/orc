@@ -60,23 +60,20 @@ public class OrcMapredRecordReader<V extends WritableComparable>
   private final VectorizedRowBatch batch;
   private int rowInBatch;
 
-  public OrcMapredRecordReader(RecordReader reader,
-                               TypeDescription schema) throws IOException {
-    this.batchReader = reader;
-    this.batch = schema.createRowBatch();
-    this.schema = schema;
-    rowInBatch = 0;
+  protected OrcMapredRecordReader(Reader reader,
+                               Reader.Options options) throws IOException {
+    this(reader, options, VectorizedRowBatch.DEFAULT_SIZE);
   }
 
   protected OrcMapredRecordReader(Reader fileReader,
-                                  Reader.Options options) throws IOException {
+                                  Reader.Options options,int rowBatchSize) throws IOException {
     this.batchReader = fileReader.rows(options);
     if (options.getSchema() == null) {
       schema = fileReader.getSchema();
     } else {
       schema = options.getSchema();
     }
-    this.batch = schema.createRowBatch();
+    this.batch = schema.createRowBatch(rowBatchSize);
     rowInBatch = 0;
   }
 
