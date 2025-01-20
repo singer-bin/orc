@@ -164,6 +164,7 @@ public interface Reader extends Closeable {
     private boolean isSchemaEvolutionCaseAware =
         (boolean) OrcConf.IS_SCHEMA_EVOLUTION_CASE_SENSITIVE.getDefaultValue();
     private boolean includeAcidColumns = true;
+    private int rowBatchSize = (int) OrcConf.ROW_BATCH_SIZE.getDefaultValue();
 
     public Options() {
       // PASS
@@ -176,6 +177,7 @@ public interface Reader extends Closeable {
       forcePositionalEvolution = OrcConf.FORCE_POSITIONAL_EVOLUTION.getBoolean(conf);
       isSchemaEvolutionCaseAware =
           OrcConf.IS_SCHEMA_EVOLUTION_CASE_SENSITIVE.getBoolean(conf);
+      rowBatchSize = OrcConf.ROW_BATCH_SIZE.getInt(conf);
     }
 
     /**
@@ -400,6 +402,21 @@ public interface Reader extends Closeable {
     public boolean getTolerateMissingSchema() {
       return tolerateMissingSchema != null ? tolerateMissingSchema :
           (Boolean) OrcConf.TOLERATE_MISSING_SCHEMA.getDefaultValue();
+    }
+
+    /**
+     * @since 1.9.0
+     */
+    public int getRowBatchSize() {
+      return rowBatchSize;
+    }
+
+    /**
+     * @since 1.9.0
+     */
+    public Options rowBatchSize(int value) {
+      this.rowBatchSize = value;
+      return this;
     }
   }
 

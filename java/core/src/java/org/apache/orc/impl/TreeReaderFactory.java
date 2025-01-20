@@ -1501,7 +1501,18 @@ public class TreeReaderFactory {
           totalLength = (int) (batchSize * scratchlcv.vector[0]);
         }
       }
-
+      if (totalLength < 0) {
+        StringBuilder sb = new StringBuilder("totalLength:" + totalLength
+                + " is a negative number.");
+        if (batchSize > 1) {
+          sb.append(" The current batch size is ");
+          sb.append(batchSize);
+          sb.append(", you can reduce the value by '");
+          sb.append(OrcConf.ROW_BATCH_SIZE.getAttribute());
+          sb.append("'.");
+        }
+        throw new IOException(sb.toString());
+      }
       // Read all the strings for this batch
       byte[] allBytes = new byte[totalLength];
       int offset = 0;

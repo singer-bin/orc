@@ -47,7 +47,7 @@ public class OrcMapreduceRecordReader<V extends WritableComparable>
 
   public OrcMapreduceRecordReader(Reader reader,
                                   Reader.Options options) throws IOException {
-    this(reader, options, VectorizedRowBatch.DEFAULT_SIZE);
+    this(reader, options, options.getRowBatchSize());
   }
 
   public OrcMapreduceRecordReader(Reader fileReader,

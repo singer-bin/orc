@@ -162,7 +162,10 @@ public enum OrcConf {
       "Comma-separated list of columns for which dictionary encoding is to be skipped."),
   // some JVM doesn't allow array creation of size Integer.MAX_VALUE, so chunk size is slightly less than max int
   ORC_MAX_DISK_RANGE_CHUNK_LIMIT("orc.max.disk.range.chunk.limit", "hive.exec.orc.max.disk.range.chunk.limit",
-    Integer.MAX_VALUE - 1024, "When reading stripes >2GB, specify max limit for the chunk size.")
+    Integer.MAX_VALUE - 1024, "When reading stripes >2GB, specify max limit for the chunk size."),
+  ROW_BATCH_SIZE("orc.row.batch.size", "orc.row.batch.size", 1024,
+          "The number of rows to include in a orc vectorized reader batch. " +
+                  "The value should be carefully chosen to minimize overhead and avoid OOMs in reading data.")
   ;
 
   private final String attribute;
