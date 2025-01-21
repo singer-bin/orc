@@ -43,6 +43,7 @@ import org.apache.hadoop.hive.ql.exec.vector.UnionColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.StringExpr;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
+import org.apache.orc.OrcConf;
 import org.apache.orc.OrcFile;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.OrcProto;
@@ -1538,6 +1539,18 @@ public class TreeReaderFactory {
         if (!scratchlcv.isNull[0]) {
           totalLength = (int) (batchSize * scratchlcv.vector[0]);
         }
+      }
+      if (totalLength < 0) {
+        StringBuilder sb = new StringBuilder("totalLength:" + totalLength
+                + " is a negative number.");
+        if (batchSize > 1) {
+          sb.append(" The current batch size is ");
+          sb.append(batchSize);
+          sb.append(", you can reduce the value by '");
+          sb.append(OrcConf.ROW_BATCH_SIZE.getAttribute());
+          sb.append("'.");
+        }
+        throw new IOException(sb.toString());
       }
 
       // Read all the strings for this batch
