@@ -18,6 +18,7 @@
 
 package org.apache.orc.impl;
 
+import com.github.luben.zstd.util.Native;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -246,6 +247,17 @@ public class WriterImpl implements Writer, MemoryManager.Callback {
     }
   }
 
+  static {
+    try {
+      if (!"java".equalsIgnoreCase(System.getProperty("orc.compression.zstd.impl"))) {
+        Native.load();
+      }
+    } catch (UnsatisfiedLinkError | ExceptionInInitializerError e) {
+      LOG.warn("Unable to load zstd-jni library for your platform. " +
+              "Using builtin-java classes where applicable");
+    }
+  }
+
   public static CompressionCodec createCodec(CompressionKind kind) {
     switch (kind) {
       case NONE:
@@ -260,6 +272,17 @@ public class WriterImpl implements Writer, MemoryManager.Callback {
       case LZ4:
         return new AircompressorCodec(new Lz4Compressor(),
             new Lz4Decompressor());
+      case ZSTD:
+//        if ("java".equalsIgnoreCase(System.getProperty("orc.compression.zstd.impl"))) {
+//          return new AircompressorCodec(kind, new ZstdCompressor(),
+//                  new ZstdDecompressor());
+//        }
+        if (Native.isLoaded()) {
+          return new ZstdCodec();
+//        } else {
+//          return new AircompressorCodec(kind, new ZstdCompressor(),
+//                  new ZstdDecompressor());
+        }
       default:
         throw new IllegalArgumentException("Unknown compression codec: " +
             kind);

@@ -62,6 +62,14 @@ public enum OrcConf {
       "Define the compression strategy to use while writing data.\n" +
           "This changes the compression level of higher level compression\n" +
           "codec (like ZLIB)."),
+  COMPRESSION_ZSTD_LEVEL("orc.compression.zstd.level",
+          "hive.exec.orc.compression.zstd.level", 1,
+          "Define the compression level to use with ZStandard codec "
+                  + "while writing data. The valid range is 1~22"),
+  COMPRESSION_ZSTD_WINDOWLOG("orc.compression.zstd.windowlog",
+          "hive.exec.orc.compression.zstd.windowlog", 0,
+          "Set the maximum allowed back-reference distance for "
+                  + "ZStandard codec, expressed as power of 2."),
   BLOCK_PADDING_TOLERANCE("orc.block.padding.tolerance",
       "hive.exec.orc.block.padding.tolerance", 0.05,
       "Define the tolerance for block padding as a decimal fraction of\n" +
@@ -188,6 +196,18 @@ public enum OrcConf {
       }
     }
     return result;
+  }
+
+  public int getInt(Properties tbl, Configuration conf) {
+    String value = lookupValue(tbl, conf);
+    if (value != null) {
+      return Integer.parseInt(value);
+    }
+    return ((Number) defaultValue).intValue();
+  }
+
+  public int getInt(Configuration conf) {
+    return getInt(null, conf);
   }
 
   public long getLong(Properties tbl, Configuration conf) {

@@ -67,6 +67,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
     <test.tmp.dir>${project.build.directory}/testing-tmp</test.tmp.dir>
+    <zstd-jni.version>1.5.5-11</zstd-jni.version>
     <example.dir>${project.basedir}/../../examples</example.dir>
 
     <hadoop.version>2.6.4</hadoop.version>
@@ -309,6 +310,11 @@
         <groupId>io.airlift</groupId>
         <artifactId>aircompressor</artifactId>
         <version>0.8</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.luben</groupId>
+        <artifactId>zstd-jni</artifactId>
+        <version>${zstd-jni.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.hadoop</groupId>

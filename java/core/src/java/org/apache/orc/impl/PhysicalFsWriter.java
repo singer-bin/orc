@@ -91,6 +91,17 @@ public class PhysicalFsWriter implements PhysicalWriter {
     rawWriter = fs.create(path, false, HDFS_BUFFER_SIZE,
         fs.getDefaultReplication(path), blockSize);
     codec = OrcCodecPool.getCodec(compress);
+    CompressionCodec.Options tempOptions = codec.getDefaultOptions();
+    if (codec instanceof ZstdCodec &&
+            codec.getDefaultOptions() instanceof ZstdCodec.ZstdOptions options) {
+      OrcFile.ZstdCompressOptions zstdCompressOptions = opts.getZstdCompressOptions();
+      if (zstdCompressOptions != null) {
+        options.setLevel(zstdCompressOptions.getCompressionZstdLevel());
+        options.setWindowLog(zstdCompressOptions.getCompressionZstdWindowLog());
+      }
+    }
+    compress.withCodec(codec, tempOptions);
+
     writer = new OutStream("metadata", bufferSize, codec,
         new DirectStream(rawWriter));
     protobufWriter = CodedOutputStream.newInstance(writer);
