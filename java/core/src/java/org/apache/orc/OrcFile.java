@@ -421,6 +421,27 @@ public class OrcFile {
     }
   }
 
+  public static class ZstdCompressOptions {
+    private int compressionZstdLevel;
+    private int compressionZstdWindowLog;
+
+    public int getCompressionZstdLevel() {
+      return compressionZstdLevel;
+    }
+
+    public void setCompressionZstdLevel(int compressionZstdLevel) {
+      this.compressionZstdLevel = compressionZstdLevel;
+    }
+
+    public int getCompressionZstdWindowLog() {
+      return compressionZstdWindowLog;
+    }
+
+    public void setCompressionZstdWindowLog(int compressionZstdWindowLog) {
+      this.compressionZstdWindowLog = compressionZstdWindowLog;
+    }
+  }
+
   /**
    * Options for creating ORC file writers.
    */
@@ -440,6 +461,7 @@ public class OrcFile {
     private WriterCallback callback;
     private EncodingStrategy encodingStrategy;
     private CompressionStrategy compressionStrategy;
+    private ZstdCompressOptions zstdCompressOptions;
     private double paddingTolerance;
     private String bloomFilterColumns;
     private double bloomFilterFpp;
@@ -483,6 +505,12 @@ public class OrcFile {
       String compString =
           OrcConf.COMPRESSION_STRATEGY.getString(tableProperties, conf);
       compressionStrategy = CompressionStrategy.valueOf(compString);
+
+      zstdCompressOptions = new ZstdCompressOptions();
+      zstdCompressOptions.setCompressionZstdLevel(
+              OrcConf.COMPRESSION_ZSTD_LEVEL.getInt(tableProperties, conf));
+      zstdCompressOptions.setCompressionZstdWindowLog(
+              OrcConf.COMPRESSION_ZSTD_WINDOWLOG.getInt(tableProperties, conf));
 
       paddingTolerance =
           OrcConf.BLOCK_PADDING_TOLERANCE.getDouble(tableProperties, conf);
@@ -903,6 +931,10 @@ public class OrcFile {
 
     public EncodingStrategy getEncodingStrategy() {
       return encodingStrategy;
+    }
+
+    public ZstdCompressOptions getZstdCompressOptions() {
+      return zstdCompressOptions;
     }
 
     public double getPaddingTolerance() {

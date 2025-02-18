@@ -29,6 +29,7 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import com.github.luben.zstd.util.Native;
 import io.airlift.compress.lz4.Lz4Compressor;
 import io.airlift.compress.lz4.Lz4Decompressor;
 import io.airlift.compress.lzo.LzoCompressor;
@@ -270,6 +271,17 @@ public class WriterImpl implements WriterInternal, MemoryManager.Callback {
     }
   }
 
+  static {
+    try {
+      if (!"java".equalsIgnoreCase(System.getProperty("orc.compression.zstd.impl"))) {
+        Native.load();
+      }
+    } catch (UnsatisfiedLinkError | ExceptionInInitializerError e) {
+      LOG.warn("Unable to load zstd-jni library for your platform. " +
+              "Using builtin-java classes where applicable");
+    }
+  }
+
   public static CompressionCodec createCodec(CompressionKind kind) {
     switch (kind) {
       case NONE:
@@ -285,8 +297,16 @@ public class WriterImpl implements WriterInternal, MemoryManager.Callback {
         return new AircompressorCodec(kind, new Lz4Compressor(),
             new Lz4Decompressor());
       case ZSTD:
-        return new AircompressorCodec(kind, new ZstdCompressor(),
-            new ZstdDecompressor());
+        if ("java".equalsIgnoreCase(System.getProperty("orc.compression.zstd.impl"))) {
+          return new AircompressorCodec(kind, new ZstdCompressor(),
+                  new ZstdDecompressor());
+        }
+        if (Native.isLoaded()) {
+          return new ZstdCodec();
+        } else {
+          return new AircompressorCodec(kind, new ZstdCompressor(),
+                  new ZstdDecompressor());
+        }
       default:
         throw new IllegalArgumentException("Unknown compression codec: " +
             kind);
