@@ -537,9 +537,15 @@ public class ColumnStatisticsImpl implements ColumnStatistics {
       OrcProto.StringStatistics str = stats.getStringStatistics();
       if (str.hasMaximum()) {
         maximum = new Text(str.getMaximum());
+      } else if (str.hasUpperBound()) {
+        maximum = new Text(str.getUpperBound());
+        isUpperBoundSet = true;
       }
       if (str.hasMinimum()) {
         minimum = new Text(str.getMinimum());
+      } else if (str.hasLowerBound()) {
+        minimum = new Text(str.getLowerBound());
+        isLowerBoundSet = true;
       }
       if(str.hasSum()) {
         sum = str.getSum();
